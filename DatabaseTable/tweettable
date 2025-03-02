@@ -1,0 +1,50 @@
+-- Step 1: Create Table
+CREATE TABLE Tweets (
+    user_id INT,
+    tweet_id INT PRIMARY KEY,
+    tweet_date DATE,
+    tweet VARCHAR(255)
+);
+-- Step 2: Insert Data
+INSERT INTO Tweets (user_id, tweet_id, tweet_date, tweet)
+VALUES
+(135, 13, '2024-02-01', 'Enjoying a great start to the day. #HappyDay #MorningVibes'),
+(136, 14, '2024-02-03', 'Another #HappyDay with good vibes! #FeelGood'),
+(137, 15, '2024-02-04', 'Productivity peaks! #WorkLife #ProductiveDay'),
+(138, 16, '2024-02-04', 'Exploring new tech frontiers. #TechLife #Innovation'),
+(139, 17, '2024-02-05', 'Gratitude for today''s moments. #HappyDay #Thankful'),
+(140, 18, '2024-02-07', 'Innovation drives us. #TechLife #FutureTech'),
+(141, 19, '2024-02-09', 'Connecting with nature''s serenity. #Nature #Peaceful');
+
+-- Step 3: Filter tweets from February 2024
+WITH FilteredTweets AS (
+    SELECT tweet
+    FROM Tweets
+    WHERE tweet_date BETWEEN '2024-02-01' AND '2024-02-29'
+),
+
+-- Step 4: Split tweets into words
+SplitWords AS (
+    SELECT regexp_split_to_table(tweet, '\s+') AS word
+    FROM FilteredTweets
+),
+
+-- Step 5: Filter only hashtags
+Hashtags AS (
+    SELECT LOWER(word) AS hashtag
+    FROM SplitWords
+    WHERE word LIKE '#%'
+),
+
+-- Step 6: Count hashtags
+HashtagCount AS (
+    SELECT hashtag, COUNT(*) AS count
+    FROM Hashtags
+    GROUP BY hashtag
+)
+
+-- Step 7: Sort and Get Top 3 Hashtags
+SELECT hashtag, count
+FROM HashtagCount
+ORDER BY count DESC, hashtag DESC
+LIMIT 3;
